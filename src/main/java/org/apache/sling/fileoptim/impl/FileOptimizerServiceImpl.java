@@ -16,7 +16,9 @@
  */
 package org.apache.sling.fileoptim.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -219,11 +221,10 @@ public class FileOptimizerServiceImpl implements FileOptimizerService, ServiceLi
 
 		mvm.put(OptimizedFile.PN_ALGORITHM, result.getAlgorithm());
 		mvm.put(OptimizedFile.PN_HASH, calculateHash(result.getOptimizedContents()));
-		mvm.put(OptimizedFile.PN_ORIGINAL, result.getOptimizedContents());
+		mvm.put(OptimizedFile.PN_ORIGINAL, mvm.get(JcrConstants.JCR_DATA, InputStream.class));
 		mvm.put(OptimizedFile.PN_SAVINGS, result.getSavings());
 
-		OptimizedFile optim = fileResource.adaptTo(OptimizedFile.class);
-		mvm.put(JcrConstants.JCR_DATA, IOUtils.toByteArray(optim.getContent()));
+		mvm.put(JcrConstants.JCR_DATA, new ByteArrayInputStream(result.getOptimizedContents()));
 
 		if (autoCommit) {
 			log.debug("Persisting changes...");
@@ -265,8 +266,7 @@ public class FileOptimizerServiceImpl implements FileOptimizerService, ServiceLi
 	}
 
 	/**
-	 * @param fileOptimizers
-	 *            the fileOptimizers to set
+	 * @param fileOptimizers the fileOptimizers to set
 	 */
 	public void setFileOptimizers(Map<String, List<ServiceReference<FileOptimizer>>> fileOptimizers) {
 		this.fileOptimizers = fileOptimizers;

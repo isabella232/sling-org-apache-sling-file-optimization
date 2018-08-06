@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jackrabbit.JcrConstants;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.fileoptim.FileOptimizerService;
@@ -51,7 +52,11 @@ public class OptimizeFileOperation implements PostOperation {
 	protected void doRun(SlingHttpServletRequest request, PostResponse response, List<Modification> changes)
 			throws IOException {
 		Resource resource = request.getResource();
+
 		if (fileOptimizer.canOptimize(resource)) {
+			if (resource.getChild(JcrConstants.JCR_CONTENT) != null) {
+				resource = resource.getChild(JcrConstants.JCR_CONTENT);
+			}
 			fileOptimizer.optimizeFile(resource, true);
 			changes.add(Modification.onModified(resource.getPath()));
 		}
