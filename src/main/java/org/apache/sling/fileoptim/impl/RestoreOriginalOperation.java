@@ -29,8 +29,8 @@ import org.apache.jackrabbit.JcrConstants;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.resource.ModifiableValueMap;
 import org.apache.sling.api.resource.Resource;
+import org.apache.sling.fileoptim.FileOptimizerConstants;
 import org.apache.sling.fileoptim.FileOptimizerService;
-import org.apache.sling.fileoptim.models.OptimizedFile;
 import org.apache.sling.servlets.post.Modification;
 import org.apache.sling.servlets.post.PostOperation;
 import org.apache.sling.servlets.post.PostResponse;
@@ -52,19 +52,18 @@ public class RestoreOriginalOperation implements PostOperation {
 	@Reference
 	private FileOptimizerService fileOptimizer;
 
-	protected void doRun(SlingHttpServletRequest request, PostResponse response, List<Modification> changes)
-			throws IOException {
+	protected void doRun(SlingHttpServletRequest request, List<Modification> changes) throws IOException {
 		Resource resource = request.getResource();
 		if (fileOptimizer.isOptimized(resource)) {
 			ModifiableValueMap mvm = resource.getChild(JcrConstants.JCR_CONTENT).adaptTo(ModifiableValueMap.class);
-			mvm.put(JcrConstants.JCR_DATA, mvm.get(OptimizedFile.PN_ORIGINAL, InputStream.class));
-			mvm.remove(OptimizedFile.PN_ORIGINAL);
-			mvm.remove(OptimizedFile.PN_ALGORITHM);
-			mvm.remove(OptimizedFile.PN_HASH);
-			mvm.remove(OptimizedFile.PN_SAVINGS);
-			
+			mvm.put(JcrConstants.JCR_DATA, mvm.get(FileOptimizerConstants.PN_ORIGINAL, InputStream.class));
+			mvm.remove(FileOptimizerConstants.PN_ORIGINAL);
+			mvm.remove(FileOptimizerConstants.PN_ALGORITHM);
+			mvm.remove(FileOptimizerConstants.PN_HASH);
+			mvm.remove(FileOptimizerConstants.PN_SAVINGS);
+
 			resource.getResourceResolver().commit();
-			
+
 			changes.add(Modification.onModified(resource.getPath()));
 		}
 	}
@@ -79,7 +78,7 @@ public class RestoreOriginalOperation implements PostOperation {
 
 			final List<Modification> changes = new ArrayList<>();
 
-			doRun(request, response, changes);
+			doRun(request, changes);
 
 			// invoke processors
 			if (processors != null) {

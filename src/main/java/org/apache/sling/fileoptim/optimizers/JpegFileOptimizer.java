@@ -28,6 +28,7 @@ import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import org.apache.sling.fileoptim.FileOptimizer;
+import org.apache.sling.fileoptim.FileOptimizerConstants;
 import org.apache.sling.fileoptim.optimizers.JpegFileOptimizer.Config;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -41,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Default optimizer which lossily compresses a JPEG image.
  */
-@Component(service = FileOptimizer.class, property = { FileOptimizer.MIME_TYPE + "=image/jpeg" })
+@Component(service = FileOptimizer.class, property = { FileOptimizerConstants.MIME_TYPE + "=image/jpeg" })
 @Designate(ocd = Config.class)
 public class JpegFileOptimizer implements FileOptimizer {
 

@@ -23,6 +23,7 @@ import javax.inject.Named;
 
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.sling.api.resource.Resource;
+import org.apache.sling.fileoptim.FileOptimizerConstants;
 import org.apache.sling.models.annotations.Default;
 import org.apache.sling.models.annotations.DefaultInjectionStrategy;
 import org.apache.sling.models.annotations.Model;
@@ -34,19 +35,11 @@ import org.apache.sling.models.annotations.Required;
 @Model(adaptables = Resource.class, defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL)
 public interface OptimizedFile {
 
-	static final String PREFIX = "optim:";
-	public static final String MT_OPTIMIZED = PREFIX + "optimized";
-	public static final String PN_ALGORITHM = PREFIX + "algrithm";
-	public static final String PN_DISABLED = PREFIX + "disabled";
-	public static final String PN_HASH = PREFIX + "hash";
-	public static final String PN_ORIGINAL = PREFIX + "original";
-	public static final String PN_SAVINGS = PREFIX + "savings";
-
-	@Named(PN_ALGORITHM)
+	@Named(FileOptimizerConstants.PN_ALGORITHM)
 	@Inject
 	String getAlgorithm();
 
-	@Named(PN_DISABLED)
+	@Named(FileOptimizerConstants.PN_DISABLED)
 	@Inject
 	@Default(booleanValues = false)
 	boolean getDisabled();
@@ -56,7 +49,7 @@ public interface OptimizedFile {
 	@Required
 	InputStream getContent();
 
-	@Named(PN_HASH)
+	@Named(FileOptimizerConstants.PN_HASH)
 	@Inject
 	String getHash();
 
@@ -65,11 +58,11 @@ public interface OptimizedFile {
 	@Required
 	String getMimeType();
 
-	@Named(PN_ORIGINAL)
+	@Named(FileOptimizerConstants.PN_ORIGINAL)
 	@Inject
 	InputStream getOriginal();
 
-	@Named(PN_SAVINGS)
+	@Named(FileOptimizerConstants.PN_SAVINGS)
 	@Inject
 	double getSavings();
 

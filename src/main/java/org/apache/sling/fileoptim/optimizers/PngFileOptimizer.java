@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.apache.sling.fileoptim.FileOptimizer;
+import org.apache.sling.fileoptim.FileOptimizerConstants;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ import com.googlecode.pngtastic.core.PngOptimizer;
 /**
  * Default optimizer which lossly compresses a PNG image.
  */
-@Component(service = FileOptimizer.class, property = { FileOptimizer.MIME_TYPE + "=image/png" })
+@Component(service = FileOptimizer.class, property = { FileOptimizerConstants.MIME_TYPE + "=image/png" })
 public class PngFileOptimizer implements FileOptimizer {
 
 	private static final Logger log = LoggerFactory.getLogger(PngFileOptimizer.class);

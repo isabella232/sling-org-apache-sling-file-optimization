@@ -39,6 +39,7 @@ import org.apache.jackrabbit.JcrConstants;
 import org.apache.sling.api.resource.ModifiableValueMap;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.fileoptim.FileOptimizer;
+import org.apache.sling.fileoptim.FileOptimizerConstants;
 import org.apache.sling.fileoptim.FileOptimizerService;
 import org.apache.sling.fileoptim.OptimizationResult;
 import org.apache.sling.fileoptim.impl.FileOptimizerServiceImpl.Config;
@@ -80,7 +81,7 @@ public class FileOptimizerServiceImpl implements FileOptimizerService, ServiceLi
 
 	private Config config;
 
-	private Map<String, List<ServiceReference<FileOptimizer>>> fileOptimizers = new HashMap<String, List<ServiceReference<FileOptimizer>>>();
+	private Map<String, List<ServiceReference<FileOptimizer>>> fileOptimizers = new HashMap<>();
 
 	@Activate
 	@Modified
@@ -119,8 +120,8 @@ public class FileOptimizerServiceImpl implements FileOptimizerService, ServiceLi
 			fileResource = fileResource.getChild(JcrConstants.JCR_CONTENT);
 		}
 		OptimizedFile of = fileResource.adaptTo(OptimizedFile.class);
-		return of != null && of.getDisabled() != true && fileOptimizers.containsKey(of.getMimeType())
-				&& fileOptimizers.get(of.getMimeType()).size() > 0;
+		return of != null && !of.getDisabled() && fileOptimizers.containsKey(of.getMimeType())
+				&& !fileOptimizers.get(of.getMimeType()).isEmpty();
 	}
 
 	@Deactivate
@@ -159,34 +160,39 @@ public class FileOptimizerServiceImpl implements FileOptimizerService, ServiceLi
 		}
 
 		if (optimize) {
-			log.debug("Optimizing file resource {}", fileResource);
-			List<ServiceReference<FileOptimizer>> optimizers = fileOptimizers.get(optim.getMimeType());
-			for (ServiceReference<FileOptimizer> ref : optimizers) {
-				FileOptimizer optimizer = bundleContext.getService(ref);
-				if (optimizer != null) {
-					byte[] optimized = optimizer.optimizeFile(original, optim.getMimeType());
-					if (optimized != null && optimized.length < original.length) {
-
-						double savings = 1.0 - ((double) optimized.length / (double) original.length);
-
-						log.debug("Optimized file with {} saving {}%", optimizer.getName(), Math.round(savings * 100));
-						result.setAlgorithm(optimizer.getName());
-						result.setSavings(savings);
-						result.setOptimized(true);
-						result.setOptimizedSize(optimized.length);
-						result.setOriginalSize(original.length);
-						result.setOptimizedContents(optimized);
-					} else {
-						log.debug("Optimizer {} was not able to optimize the file", optimizer.getName());
-					}
-				} else {
-					log.warn("No service retrieved for service reference {}", ref);
-				}
-			}
+			doOptimize(fileResource, result, optim, original);
 		} else {
 			log.trace("Resource {} is already optimized", fileResource);
 		}
 		return result;
+	}
+
+	private void doOptimize(Resource fileResource, OptimizationResult result, OptimizedFile optim, byte[] original) {
+		log.debug("Optimizing file resource {}", fileResource);
+		List<ServiceReference<FileOptimizer>> optimizers = fileOptimizers.get(optim.getMimeType());
+		for (ServiceReference<FileOptimizer> ref : optimizers) {
+			FileOptimizer optimizer = bundleContext.getService(ref);
+			if (optimizer == null) {
+				log.warn("No service retrieved for service reference {}", ref);
+				continue;
+			}
+
+			byte[] optimized = optimizer.optimizeFile(original, optim.getMimeType());
+			if (optimized != null && optimized.length < original.length) {
+
+				double savings = 1.0 - ((double) optimized.length / (double) original.length);
+
+				log.debug("Optimized file with {} saving {}%", optimizer.getName(), Math.round(savings * 100));
+				result.setAlgorithm(optimizer.getName());
+				result.setSavings(savings);
+				result.setOptimized(true);
+				result.setOptimizedSize(optimized.length);
+				result.setOriginalSize(original.length);
+				result.setOptimizedContents(optimized);
+			} else {
+				log.debug("Optimizer {} was not able to optimize the file", optimizer.getName());
+			}
+		}
 	}
 
 	@Override
@@ -215,14 +221,14 @@ public class FileOptimizerServiceImpl implements FileOptimizerService, ServiceLi
 
 		ModifiableValueMap mvm = fileResource.adaptTo(ModifiableValueMap.class);
 
-		Set<String> mixins = new HashSet<String>(Arrays.asList(mvm.get(JcrConstants.JCR_MIXINTYPES, new String[0])));
-		mixins.add(OptimizedFile.MT_OPTIMIZED);
+		Set<String> mixins = new HashSet<>(Arrays.asList(mvm.get(JcrConstants.JCR_MIXINTYPES, new String[0])));
+		mixins.add(FileOptimizerConstants.MT_OPTIMIZED);
 		mvm.put(JcrConstants.JCR_MIXINTYPES, mixins.toArray(new String[] {}));
 
-		mvm.put(OptimizedFile.PN_ALGORITHM, result.getAlgorithm());
-		mvm.put(OptimizedFile.PN_HASH, calculateHash(result.getOptimizedContents()));
-		mvm.put(OptimizedFile.PN_ORIGINAL, mvm.get(JcrConstants.JCR_DATA, InputStream.class));
-		mvm.put(OptimizedFile.PN_SAVINGS, result.getSavings());
+		mvm.put(FileOptimizerConstants.PN_ALGORITHM, result.getAlgorithm());
+		mvm.put(FileOptimizerConstants.PN_HASH, calculateHash(result.getOptimizedContents()));
+		mvm.put(FileOptimizerConstants.PN_ORIGINAL, mvm.get(JcrConstants.JCR_DATA, InputStream.class));
+		mvm.put(FileOptimizerConstants.PN_SAVINGS, result.getSavings());
 
 		mvm.put(JcrConstants.JCR_DATA, new ByteArrayInputStream(result.getOptimizedContents()));
 
@@ -237,7 +243,7 @@ public class FileOptimizerServiceImpl implements FileOptimizerService, ServiceLi
 
 	private void rebuildOptimizerCache() {
 		log.debug("rebuildOptimizerCache");
-		Map<String, List<ServiceReference<FileOptimizer>>> tempCache = new HashMap<String, List<ServiceReference<FileOptimizer>>>();
+		Map<String, List<ServiceReference<FileOptimizer>>> tempCache = new HashMap<>();
 		Collection<ServiceReference<FileOptimizer>> references = null;
 		try {
 			references = bundleContext.getServiceReferences(FileOptimizer.class, null);
@@ -245,8 +251,8 @@ public class FileOptimizerServiceImpl implements FileOptimizerService, ServiceLi
 			log.error("Exception retrieving service references", e);
 		}
 		for (ServiceReference<FileOptimizer> ref : references) {
-			Object mimeType = ref.getProperty(FileOptimizer.MIME_TYPE);
-			if (mimeType != null && mimeType instanceof String[]) {
+			Object mimeType = ref.getProperty(FileOptimizerConstants.MIME_TYPE);
+			if (mimeType instanceof String[]) {
 				for (String mt : (String[]) mimeType) {
 					addOptimizer(tempCache, mt, ref);
 				}

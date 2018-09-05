@@ -17,7 +17,6 @@
 package org.apache.sling.fileoptim.impl.servlets;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -42,10 +41,11 @@ import org.osgi.service.component.annotations.Reference;
 public class FileOptimizerPreview extends SlingSafeMethodsServlet {
 
 	@Reference
-	private FileOptimizerService fileOptimizer;
+	private transient FileOptimizerService fileOptimizer;
 
 	private static final long serialVersionUID = 8635343288414416865L;
 
+	@Override
 	protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response)
 			throws ServletException, IOException {
 		String path = request.getParameter("path");
@@ -59,7 +59,7 @@ public class FileOptimizerPreview extends SlingSafeMethodsServlet {
 			ValueMap vm = res.getResource().getValueMap();
 			response.setContentType(vm.get(JcrConstants.JCR_MIMETYPE, String.class));
 			response.setHeader("Content-disposition", "inline; filename=" + resource.getName());
-			IOUtils.copy(vm.get(JcrConstants.JCR_DATA, InputStream.class), response.getOutputStream());
+			IOUtils.copy(res.getOptimizedContentStream(), response.getOutputStream());
 		} else {
 			response.sendError(400, "Resource at path " + path + " is not a file or cannot be optimized");
 		}

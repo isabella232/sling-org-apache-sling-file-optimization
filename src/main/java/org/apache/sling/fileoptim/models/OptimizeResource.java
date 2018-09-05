@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.sling.api.resource.PersistenceException;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.fileoptim.FileOptimizerService;
 import org.apache.sling.fileoptim.OptimizationResult;
@@ -52,7 +51,7 @@ public class OptimizeResource {
 	}
 
 	@PostConstruct
-	public void init() throws PersistenceException, IOException {
+	public void init() throws IOException {
 		log.debug("initializing with resource {}", resource);
 		if (fileOptimizer.canOptimize(resource)) {
 			this.canOptimize = true;

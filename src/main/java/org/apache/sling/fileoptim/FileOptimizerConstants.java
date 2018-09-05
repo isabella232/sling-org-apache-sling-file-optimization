@@ -14,5 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@org.osgi.annotation.versioning.Version("2.0.0")
 package org.apache.sling.fileoptim;
+
+public class FileOptimizerConstants {
+
+	private FileOptimizerConstants() {
+	}
+
+	public static final String MIME_TYPE = "mime.type";
+	public static final String PREFIX = "optim:";
+	public static final String MT_OPTIMIZED = PREFIX + "optimized";
+	public static final String PN_ALGORITHM = FileOptimizerConstants.PREFIX + "algrithm";
+	public static final String PN_DISABLED = FileOptimizerConstants.PREFIX + "disabled";
+	public static final String PN_HASH = FileOptimizerConstants.PREFIX + "hash";
+	public static final String PN_ORIGINAL = FileOptimizerConstants.PREFIX + "original";
+	public static final String PN_SAVINGS = FileOptimizerConstants.PREFIX + "savings";
+
+}

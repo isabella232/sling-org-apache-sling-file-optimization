@@ -40,10 +40,11 @@ import org.osgi.service.component.annotations.Reference;
 public class FileOptimizerData extends SlingSafeMethodsServlet {
 
 	@Reference
-	private FileOptimizerService fileOptimizer;
+	private transient FileOptimizerService fileOptimizer;
 
 	private static final long serialVersionUID = 8635343288414416865L;
 
+	@Override
 	protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response)
 			throws ServletException, IOException {
 		String path = request.getParameter("path");

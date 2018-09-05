@@ -18,7 +18,6 @@ package org.apache.sling.fileoptim;
 
 import java.io.IOException;
 
-import org.apache.sling.api.resource.PersistenceException;
 import org.apache.sling.api.resource.Resource;
 
 /**
@@ -31,8 +30,7 @@ public interface FileOptimizerService {
 	 * resource is enabled and if an optimizer is registered for the file's meta
 	 * type
 	 * 
-	 * @param fileResource
-	 *            the resource to check if the optimizer is available
+	 * @param fileResource the resource to check if the optimizer is available
 	 * @return true if the file optimizer can optimize the file, false otherwise
 	 */
 	boolean canOptimize(Resource fileResource);
@@ -42,11 +40,9 @@ public interface FileOptimizerService {
 	 * underlying resource, but instead just returns the results of optimizing the
 	 * resource.
 	 * 
-	 * @param fileResource
-	 *            the resource to optimize
+	 * @param fileResource the resource to optimize
 	 * @return the results of the optimization
-	 * @throws IOException
-	 *             an exception occurs reading the original resource
+	 * @throws IOException an exception occurs reading the original resource
 	 */
 	OptimizationResult getOptimizedContents(Resource fileResource) throws IOException;
 
@@ -54,8 +50,7 @@ public interface FileOptimizerService {
 	 * Returns true if the specified resource has already been optimized by the
 	 * FileOptimizer.
 	 * 
-	 * @param fileResource
-	 *            the resource to check
+	 * @param fileResource the resource to check
 	 * @return true if optimized by the file optimizer, false otherwise
 	 */
 	boolean isOptimized(Resource fileResource);
@@ -63,17 +58,12 @@ public interface FileOptimizerService {
 	/**
 	 * Optimizes a file resource. This method will modify the underlying resource.
 	 * 
-	 * @param fileResource
-	 *            the resource to optimize
-	 * @param autoCommit
-	 *            if true, the results will automatically be committed to the Sling
-	 *            Repo
+	 * @param fileResource the resource to optimize
+	 * @param autoCommit   if true, the results will automatically be committed to
+	 *                     the Sling Repo
 	 * @return the results of the optimization
-	 * @throws PersistenceException
-	 *             an exception occurs saving the optimized resource
-	 * @throws IOException
-	 *             an exception occurs reading the original resource
+	 * @throws IOException an exception occurs reading the original resource
 	 */
-	OptimizationResult optimizeFile(Resource fileResource, boolean autoCommit) throws PersistenceException, IOException;
+	OptimizationResult optimizeFile(Resource fileResource, boolean autoCommit) throws IOException;
 
 }

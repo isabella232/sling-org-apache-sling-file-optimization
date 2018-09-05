@@ -49,8 +49,7 @@ public class OptimizeFileOperation implements PostOperation {
 	@Reference
 	private FileOptimizerService fileOptimizer;
 
-	protected void doRun(SlingHttpServletRequest request, PostResponse response, List<Modification> changes)
-			throws IOException {
+	protected void doRun(SlingHttpServletRequest request, List<Modification> changes) throws IOException {
 		Resource resource = request.getResource();
 
 		if (fileOptimizer.canOptimize(resource)) {
@@ -72,7 +71,7 @@ public class OptimizeFileOperation implements PostOperation {
 
 			final List<Modification> changes = new ArrayList<>();
 
-			doRun(request, response, changes);
+			doRun(request, changes);
 
 			// invoke processors
 			if (processors != null) {

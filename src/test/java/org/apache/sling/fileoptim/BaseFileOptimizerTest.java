@@ -63,7 +63,7 @@ public abstract class BaseFileOptimizerTest {
 		// allow for populating the service cache
 		@SuppressWarnings("unchecked")
 		ServiceReference<FileOptimizer> ref = Mockito.mock(ServiceReference.class);
-		Mockito.when(ref.getProperty(FileOptimizer.MIME_TYPE)).thenReturn("image/jpeg");
+		Mockito.when(ref.getProperty(FileOptimizerConstants.MIME_TYPE)).thenReturn("image/jpeg");
 		Collection<ServiceReference<FileOptimizer>> references = new ArrayList<ServiceReference<FileOptimizer>>();
 		references.add(ref);
 		Mockito.when(bundleContext.getServiceReferences(FileOptimizer.class, null)).thenReturn(references);

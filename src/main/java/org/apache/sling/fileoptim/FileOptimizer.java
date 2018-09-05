@@ -16,22 +16,22 @@
  */
 package org.apache.sling.fileoptim;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Interface for File Optimizers to extend to implement
  */
 public interface FileOptimizer {
 
-	public static final String MIME_TYPE = "mime.type";
-
 	/**
 	 * Optimize a single file.
 	 * 
-	 * @param original
-	 *            the original file to optimize
-	 * @param metaType
-	 *            the type of the file to optimize
+	 * @param original the original file to optimize
+	 * @param metaType the type of the file to optimize
 	 * @return the optimized file
 	 */
+	@Nullable
 	byte[] optimizeFile(byte[] original, String metaType);
 
 	/**
@@ -39,6 +39,7 @@ public interface FileOptimizer {
 	 * 
 	 * @return the name of the optimizer
 	 */
+	@NotNull
 	String getName();
 
 }

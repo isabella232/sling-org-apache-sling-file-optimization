@@ -70,6 +70,7 @@ public class FileOptimizerFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
+		// Nothing required
 	}
 
 	@Override
@@ -104,6 +105,7 @@ public class FileOptimizerFilter implements Filter {
 
 	@Override
 	public void destroy() {
+		// Nothing requireds
 	}
 
 }
