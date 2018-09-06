@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.sling.fileoptim.optimizers.JpegFileOptimizer;
-import org.apache.sling.fileoptim.optimizers.JpegFileOptimizer.Config;
+import org.apache.sling.fileoptim.internal.optimizers.JpegFileOptimizer;
+import org.apache.sling.fileoptim.internal.optimizers.JpegFileOptimizer.Config;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -33,44 +33,44 @@ import org.slf4j.LoggerFactory;
 
 public class TestJPGFileOptimizer {
 
-	private JpegFileOptimizer optimizer = new JpegFileOptimizer();
+    private JpegFileOptimizer optimizer = new JpegFileOptimizer();
 
-	private static final Logger log = LoggerFactory.getLogger(TestJPGFileOptimizer.class);
+    private static final Logger log = LoggerFactory.getLogger(TestJPGFileOptimizer.class);
 
-	@Before
-	public void init() {
+    @Before
+    public void init() {
 
-		Config config = new Config() {
-			{
-			}
+        Config config = new Config() {
+            {
+            }
 
-			@Override
-			public Class<? extends Annotation> annotationType() {
-				return null;
-			}
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return null;
+            }
 
-			@Override
-			public float compressionLevel() {
-				return 0.75f;
-			}
-		};
-		optimizer.activate(config);
-	}
+            @Override
+            public float compressionLevel() {
+                return 0.75f;
+            }
+        };
+        optimizer.activate(config);
+    }
 
-	@Test
-	public void testOptimizer() throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		IOUtils.copy(getClass().getClassLoader().getResourceAsStream("valentino-funghi-41239-unsplash.jpg"), baos);
-		byte[] optimized = optimizer.optimizeFile(baos.toByteArray(), "image/jpeg");
+    @Test
+    public void testOptimizer() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        IOUtils.copy(getClass().getClassLoader().getResourceAsStream("valentino-funghi-41239-unsplash.jpg"), baos);
+        byte[] optimized = optimizer.optimizeFile(baos.toByteArray(), "image/jpeg");
 
-		assertTrue(baos.toByteArray().length > optimized.length);
+        assertTrue(baos.toByteArray().length > optimized.length);
 
-		log.info("Original size: {}", baos.toByteArray().length);
-		log.info("Optimized size: {}", optimized.length);
+        log.info("Original size: {}", baos.toByteArray().length);
+        log.info("Optimized size: {}", optimized.length);
 
-		double savings = 1.0 - ((double) optimized.length / (double) baos.toByteArray().length);
-		log.info("Compressed by {}%", Math.round(savings * 100.0));
-		
-		IOUtils.write(optimized, new FileOutputStream("target/optimized.jpg"));
-	}
+        double savings = 1.0 - ((double) optimized.length / (double) baos.toByteArray().length);
+        log.info("Compressed by {}%", Math.round(savings * 100.0));
+
+        IOUtils.write(optimized, new FileOutputStream("target/optimized.jpg"));
+    }
 }

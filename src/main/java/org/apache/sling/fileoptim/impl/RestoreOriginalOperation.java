@@ -44,66 +44,66 @@ import org.slf4j.LoggerFactory;
  * The File Optimization operation restore the original file
  */
 @Component(immediate = true, service = { PostOperation.class }, property = PostOperation.PROP_OPERATION_NAME
-		+ "=fileoptim:restore")
+        + "=fileoptim:restore")
 public class RestoreOriginalOperation implements PostOperation {
 
-	private static final Logger log = LoggerFactory.getLogger(RestoreOriginalOperation.class);
+    private static final Logger log = LoggerFactory.getLogger(RestoreOriginalOperation.class);
 
-	@Reference
-	private FileOptimizerService fileOptimizer;
+    @Reference
+    private FileOptimizerService fileOptimizer;
 
-	protected void doRun(SlingHttpServletRequest request, List<Modification> changes) throws IOException {
-		Resource resource = request.getResource();
-		if (fileOptimizer.isOptimized(resource)) {
-			ModifiableValueMap mvm = resource.getChild(JcrConstants.JCR_CONTENT).adaptTo(ModifiableValueMap.class);
-			mvm.put(JcrConstants.JCR_DATA, mvm.get(FileOptimizerConstants.PN_ORIGINAL, InputStream.class));
-			mvm.remove(FileOptimizerConstants.PN_ORIGINAL);
-			mvm.remove(FileOptimizerConstants.PN_ALGORITHM);
-			mvm.remove(FileOptimizerConstants.PN_HASH);
-			mvm.remove(FileOptimizerConstants.PN_SAVINGS);
+    protected void doRun(SlingHttpServletRequest request, List<Modification> changes) throws IOException {
+        Resource resource = request.getResource();
+        if (fileOptimizer.isOptimized(resource)) {
+            ModifiableValueMap mvm = resource.getChild(JcrConstants.JCR_CONTENT).adaptTo(ModifiableValueMap.class);
+            mvm.put(JcrConstants.JCR_DATA, mvm.get(FileOptimizerConstants.PN_ORIGINAL, InputStream.class));
+            mvm.remove(FileOptimizerConstants.PN_ORIGINAL);
+            mvm.remove(FileOptimizerConstants.PN_ALGORITHM);
+            mvm.remove(FileOptimizerConstants.PN_HASH);
+            mvm.remove(FileOptimizerConstants.PN_SAVINGS);
 
-			resource.getResourceResolver().commit();
+            resource.getResourceResolver().commit();
 
-			changes.add(Modification.onModified(resource.getPath()));
-		}
-	}
+            changes.add(Modification.onModified(resource.getPath()));
+        }
+    }
 
-	public void run(final SlingHttpServletRequest request, final PostResponse response,
-			final SlingPostProcessor[] processors) {
+    public void run(final SlingHttpServletRequest request, final PostResponse response,
+            final SlingPostProcessor[] processors) {
 
-		try {
-			// calculate the paths
-			String path = request.getResource().getPath();
-			response.setPath(path);
+        try {
+            // calculate the paths
+            String path = request.getResource().getPath();
+            response.setPath(path);
 
-			final List<Modification> changes = new ArrayList<>();
+            final List<Modification> changes = new ArrayList<>();
 
-			doRun(request, changes);
+            doRun(request, changes);
 
-			// invoke processors
-			if (processors != null) {
-				for (SlingPostProcessor processor : processors) {
-					processor.process(request, changes);
-				}
-			}
+            // invoke processors
+            if (processors != null) {
+                for (SlingPostProcessor processor : processors) {
+                    processor.process(request, changes);
+                }
+            }
 
-			// check modifications for remaining postfix and store the base path
-			final Map<String, String> modificationSourcesContainingPostfix = new HashMap<>();
-			final Set<String> allModificationSources = new HashSet<>(changes.size());
-			for (final Modification modification : changes) {
-				final String source = modification.getSource();
-				if (source != null) {
-					allModificationSources.add(source);
-					final int atIndex = source.indexOf('@');
-					if (atIndex > 0) {
-						modificationSourcesContainingPostfix.put(source.substring(0, atIndex), source);
-					}
-				}
-			}
-		} catch (Exception e) {
-			log.error("Exception during response processing.", e);
-			response.setError(e);
-		}
-	}
+            // check modifications for remaining postfix and store the base path
+            final Map<String, String> modificationSourcesContainingPostfix = new HashMap<>();
+            final Set<String> allModificationSources = new HashSet<>(changes.size());
+            for (final Modification modification : changes) {
+                final String source = modification.getSource();
+                if (source != null) {
+                    allModificationSources.add(source);
+                    final int atIndex = source.indexOf('@');
+                    if (atIndex > 0) {
+                        modificationSourcesContainingPostfix.put(source.substring(0, atIndex), source);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Exception during response processing.", e);
+            response.setError(e);
+        }
+    }
 
 }

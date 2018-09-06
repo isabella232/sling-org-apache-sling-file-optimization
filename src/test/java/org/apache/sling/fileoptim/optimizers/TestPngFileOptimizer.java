@@ -23,31 +23,31 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.sling.fileoptim.optimizers.PngFileOptimizer;
+import org.apache.sling.fileoptim.internal.optimizers.PngFileOptimizer;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TestPngFileOptimizer {
 
-	private PngFileOptimizer optimizer = new PngFileOptimizer();
+    private PngFileOptimizer optimizer = new PngFileOptimizer();
 
-	private static final Logger log = LoggerFactory.getLogger(TestPngFileOptimizer.class);
+    private static final Logger log = LoggerFactory.getLogger(TestPngFileOptimizer.class);
 
-	@Test
-	public void testOptimizer() throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		IOUtils.copy(getClass().getClassLoader().getResourceAsStream("Screen Shot 2018-05-29 at 4.17.20 PM.png"), baos);
-		byte[] optimized = optimizer.optimizeFile(baos.toByteArray(), "image/png");
+    @Test
+    public void testOptimizer() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        IOUtils.copy(getClass().getClassLoader().getResourceAsStream("Screen Shot 2018-05-29 at 4.17.20 PM.png"), baos);
+        byte[] optimized = optimizer.optimizeFile(baos.toByteArray(), "image/png");
 
-		assertTrue(baos.toByteArray().length > optimized.length);
+        assertTrue(baos.toByteArray().length > optimized.length);
 
-		log.info("Original size: {}", baos.toByteArray().length);
-		log.info("Optimized size: {}", optimized.length);
+        log.info("Original size: {}", baos.toByteArray().length);
+        log.info("Optimized size: {}", optimized.length);
 
-		double savings = 1.0 - ((double) optimized.length / (double) baos.toByteArray().length);
-		log.info("Compressed by {}%", Math.round(savings * 100.0));
+        double savings = 1.0 - ((double) optimized.length / (double) baos.toByteArray().length);
+        log.info("Compressed by {}%", Math.round(savings * 100.0));
 
-		IOUtils.write(optimized, new FileOutputStream("target/optimized.png"));
-	}
+        IOUtils.write(optimized, new FileOutputStream("target/optimized.png"));
+    }
 }

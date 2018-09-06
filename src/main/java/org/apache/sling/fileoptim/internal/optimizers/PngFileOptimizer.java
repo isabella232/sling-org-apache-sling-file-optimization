@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.sling.fileoptim.optimizers;
+package org.apache.sling.fileoptim.internal.optimizers;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,30 +35,30 @@ import com.googlecode.pngtastic.core.PngOptimizer;
 @Component(service = FileOptimizer.class, property = { FileOptimizerConstants.MIME_TYPE + "=image/png" })
 public class PngFileOptimizer implements FileOptimizer {
 
-	private static final Logger log = LoggerFactory.getLogger(PngFileOptimizer.class);
+    private static final Logger log = LoggerFactory.getLogger(PngFileOptimizer.class);
 
-	@Override
-	public byte[] optimizeFile(byte[] original, String metaType) {
+    @Override
+    public byte[] optimizeFile(byte[] original, String metaType) {
 
-		PngOptimizer optimizer = new PngOptimizer();
+        PngOptimizer optimizer = new PngOptimizer();
 
-		PngImage image = new PngImage(new ByteArrayInputStream(original));
-		try {
-			PngImage optimized = optimizer.optimize(image);
+        PngImage image = new PngImage(new ByteArrayInputStream(original));
+        try {
+            PngImage optimized = optimizer.optimize(image);
 
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			optimized.writeDataOutputStream(baos);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            optimized.writeDataOutputStream(baos);
 
-			return baos.toByteArray();
-		} catch (IOException e) {
-			log.warn("Exception optimizing PNG image", e);
-		}
-		return null;
-	}
+            return baos.toByteArray();
+        } catch (IOException e) {
+            log.warn("Exception optimizing PNG image", e);
+        }
+        return null;
+    }
 
-	@Override
-	public String getName() {
-		return "PNGTastic PNG Optimizer";
-	}
+    @Override
+    public String getName() {
+        return "PNGTastic PNG Optimizer";
+    }
 
 }

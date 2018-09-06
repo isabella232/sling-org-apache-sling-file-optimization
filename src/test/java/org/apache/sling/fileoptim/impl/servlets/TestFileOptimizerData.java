@@ -39,47 +39,47 @@ import org.slf4j.LoggerFactory;
 
 public class TestFileOptimizerData extends BaseFileOptimizerTest {
 
-	public TestFileOptimizerData() throws InvalidSyntaxException {
-		super();
-		log.trace("TestFileOptimizerData()");
-	}
+    public TestFileOptimizerData() throws InvalidSyntaxException {
+        super();
+        log.trace("TestFileOptimizerData()");
+    }
 
-	private static final Logger log = LoggerFactory.getLogger(TestFileOptimizerData.class);
-	private static final String PATH = "/content/file.jpg";
-	private StringWriter writer;
-	private SlingHttpServletRequest request;
-	private SlingHttpServletResponse response;
-	private FileOptimizerData servlet;
+    private static final Logger log = LoggerFactory.getLogger(TestFileOptimizerData.class);
+    private static final String PATH = "/content/file.jpg";
+    private StringWriter writer;
+    private SlingHttpServletRequest request;
+    private SlingHttpServletResponse response;
+    private FileOptimizerData servlet;
 
-	@Before
-	public void initTest() throws IOException, NoSuchFieldException, SecurityException, IllegalArgumentException,
-			IllegalAccessException {
-		log.trace("initTest");
-		request = Mockito.mock(SlingHttpServletRequest.class);
-		Mockito.when(request.getParameter("path")).thenReturn(PATH);
-		ResourceResolver resolver = Mockito.mock(ResourceResolver.class);
-		Mockito.when(request.getResourceResolver()).thenReturn(resolver);
-		Resource jpegResource = getValidJpegFile();
-		Mockito.when(resolver.getResource(PATH)).thenReturn(jpegResource);
+    @Before
+    public void initTest() throws IOException, NoSuchFieldException, SecurityException, IllegalArgumentException,
+            IllegalAccessException {
+        log.trace("initTest");
+        request = Mockito.mock(SlingHttpServletRequest.class);
+        Mockito.when(request.getParameter("path")).thenReturn(PATH);
+        ResourceResolver resolver = Mockito.mock(ResourceResolver.class);
+        Mockito.when(request.getResourceResolver()).thenReturn(resolver);
+        Resource jpegResource = getValidJpegFile();
+        Mockito.when(resolver.getResource(PATH)).thenReturn(jpegResource);
 
-		this.writer = new StringWriter();
-		response = Mockito.mock(SlingHttpServletResponse.class);
-		Mockito.when(response.getWriter()).thenReturn(new PrintWriter(writer));
+        this.writer = new StringWriter();
+        response = Mockito.mock(SlingHttpServletResponse.class);
+        Mockito.when(response.getWriter()).thenReturn(new PrintWriter(writer));
 
-		servlet = new FileOptimizerData();
-		Field fo = FileOptimizerData.class.getDeclaredField("fileOptimizer");
-		fo.setAccessible(true);
-		fo.set(servlet, this.fileOptimizerService);
-	}
+        servlet = new FileOptimizerData();
+        Field fo = FileOptimizerData.class.getDeclaredField("fileOptimizer");
+        fo.setAccessible(true);
+        fo.set(servlet, this.fileOptimizerService);
+    }
 
-	@Test
-	public void testServlet() throws ServletException, IOException {
+    @Test
+    public void testServlet() throws ServletException, IOException {
 
-		servlet.doGet(request, response);
+        servlet.doGet(request, response);
 
-		String response = writer.toString();
-		assertNotNull(response);
-		log.info(response);
-		
-	}
+        String response = writer.toString();
+        assertNotNull(response);
+        log.info(response);
+
+    }
 }

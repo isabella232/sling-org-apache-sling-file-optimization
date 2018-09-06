@@ -68,214 +68,214 @@ import org.slf4j.LoggerFactory;
 @Designate(ocd = Config.class)
 public class FileOptimizerServiceImpl implements FileOptimizerService, ServiceListener {
 
-	@ObjectClassDefinition(name = "%file.optimizer.name", description = "%file.optimizer.description", localization = "OSGI-INF/l10n/bundle")
-	public @interface Config {
+    @ObjectClassDefinition(name = "%file.optimizer.name", description = "%file.optimizer.description", localization = "OSGI-INF/l10n/bundle")
+    public @interface Config {
 
-		@AttributeDefinition(name = "%file.optimizer.hash.algorithm.name", description = "%file.optimizer.hash.algorithm.description")
-		String hashAlgorithm() default "MD5";
-	}
+        @AttributeDefinition(name = "%file.optimizer.hash.algorithm.name", description = "%file.optimizer.hash.algorithm.description")
+        String hashAlgorithm() default "MD5";
+    }
 
-	private static final Logger log = LoggerFactory.getLogger(FileOptimizerServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(FileOptimizerServiceImpl.class);
 
-	private BundleContext bundleContext;
+    private BundleContext bundleContext;
 
-	private Config config;
+    private Config config;
 
-	private Map<String, List<ServiceReference<FileOptimizer>>> fileOptimizers = new HashMap<>();
+    private Map<String, List<ServiceReference<FileOptimizer>>> fileOptimizers = new HashMap<>();
 
-	@Activate
-	@Modified
-	public void activate(ComponentContext context, Config config) throws InvalidSyntaxException {
-		bundleContext = context.getBundleContext();
-		this.config = config;
-		this.rebuildOptimizerCache();
-		bundleContext.addServiceListener(this, "(" + Constants.OBJECTCLASS + "=" + FileOptimizer.class.getName() + ")");
-	}
+    @Activate
+    @Modified
+    public void activate(ComponentContext context, Config config) throws InvalidSyntaxException {
+        bundleContext = context.getBundleContext();
+        this.config = config;
+        this.rebuildOptimizerCache();
+        bundleContext.addServiceListener(this, "(" + Constants.OBJECTCLASS + "=" + FileOptimizer.class.getName() + ")");
+    }
 
-	private void addOptimizer(Map<String, List<ServiceReference<FileOptimizer>>> tempCache, String metaType,
-			ServiceReference<FileOptimizer> ref) {
-		if (!tempCache.containsKey(metaType)) {
-			tempCache.put(metaType, new ArrayList<ServiceReference<FileOptimizer>>());
-		}
-		tempCache.get(metaType).add(ref);
-	}
+    private void addOptimizer(Map<String, List<ServiceReference<FileOptimizer>>> tempCache, String metaType,
+            ServiceReference<FileOptimizer> ref) {
+        if (!tempCache.containsKey(metaType)) {
+            tempCache.put(metaType, new ArrayList<ServiceReference<FileOptimizer>>());
+        }
+        tempCache.get(metaType).add(ref);
+    }
 
-	private String calculateHash(byte[] bytes) {
-		MessageDigest messageDigest;
-		try {
-			messageDigest = MessageDigest.getInstance(config.hashAlgorithm());
-			messageDigest.reset();
-			messageDigest.update(bytes);
-			return Base64.encodeBase64String(messageDigest.digest());
-		} catch (NoSuchAlgorithmException e) {
-			log.error("Exception generating hash", e);
-		}
-		return null;
-	}
+    private String calculateHash(byte[] bytes) {
+        MessageDigest messageDigest;
+        try {
+            messageDigest = MessageDigest.getInstance(config.hashAlgorithm());
+            messageDigest.reset();
+            messageDigest.update(bytes);
+            return Base64.encodeBase64String(messageDigest.digest());
+        } catch (NoSuchAlgorithmException e) {
+            log.error("Exception generating hash", e);
+        }
+        return null;
+    }
 
-	@Override
-	public boolean canOptimize(Resource fileResource) {
-		if (!fileResource.getName().equals(JcrConstants.JCR_CONTENT)
-				&& fileResource.getChild(JcrConstants.JCR_CONTENT) != null) {
-			fileResource = fileResource.getChild(JcrConstants.JCR_CONTENT);
-		}
-		OptimizedFile of = fileResource.adaptTo(OptimizedFile.class);
-		return of != null && !of.getDisabled() && fileOptimizers.containsKey(of.getMimeType())
-				&& !fileOptimizers.get(of.getMimeType()).isEmpty();
-	}
+    @Override
+    public boolean canOptimize(Resource fileResource) {
+        if (!fileResource.getName().equals(JcrConstants.JCR_CONTENT)
+                && fileResource.getChild(JcrConstants.JCR_CONTENT) != null) {
+            fileResource = fileResource.getChild(JcrConstants.JCR_CONTENT);
+        }
+        OptimizedFile of = fileResource.adaptTo(OptimizedFile.class);
+        return of != null && !of.getDisabled() && fileOptimizers.containsKey(of.getMimeType())
+                && !fileOptimizers.get(of.getMimeType()).isEmpty();
+    }
 
-	@Deactivate
-	public void deactivate(ComponentContext context) {
-		context.getBundleContext().removeServiceListener(this);
-	}
+    @Deactivate
+    public void deactivate(ComponentContext context) {
+        context.getBundleContext().removeServiceListener(this);
+    }
 
-	/**
-	 * @return the fileOptimizers
-	 */
-	public Map<String, List<ServiceReference<FileOptimizer>>> getFileOptimizers() {
-		return fileOptimizers;
-	}
+    /**
+     * @return the fileOptimizers
+     */
+    public Map<String, List<ServiceReference<FileOptimizer>>> getFileOptimizers() {
+        return fileOptimizers;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.apache.sling.fileoptim.FileOptimizerService#getOptimizedContents(org.
-	 * apache.sling.api.resource.Resource)
-	 */
-	@Override
-	public OptimizationResult getOptimizedContents(Resource fileResource) throws IOException {
-		if (!fileResource.getName().equals(JcrConstants.JCR_CONTENT)
-				&& fileResource.getChild(JcrConstants.JCR_CONTENT) != null) {
-			fileResource = fileResource.getChild(JcrConstants.JCR_CONTENT);
-		}
-		OptimizationResult result = new OptimizationResult(fileResource);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.sling.fileoptim.FileOptimizerService#getOptimizedContents(org.
+     * apache.sling.api.resource.Resource)
+     */
+    @Override
+    public OptimizationResult getOptimizedContents(Resource fileResource) throws IOException {
+        if (!fileResource.getName().equals(JcrConstants.JCR_CONTENT)
+                && fileResource.getChild(JcrConstants.JCR_CONTENT) != null) {
+            fileResource = fileResource.getChild(JcrConstants.JCR_CONTENT);
+        }
+        OptimizationResult result = new OptimizationResult(fileResource);
 
-		OptimizedFile optim = fileResource.adaptTo(OptimizedFile.class);
+        OptimizedFile optim = fileResource.adaptTo(OptimizedFile.class);
 
-		boolean optimize = true;
-		byte[] original = IOUtils.toByteArray(optim.getContent());
-		if (StringUtils.isNotBlank(optim.getHash()) && optim.getHash().equals(calculateHash(original))) {
-			optimize = false;
-		}
+        boolean optimize = true;
+        byte[] original = IOUtils.toByteArray(optim.getContent());
+        if (StringUtils.isNotBlank(optim.getHash()) && optim.getHash().equals(calculateHash(original))) {
+            optimize = false;
+        }
 
-		if (optimize) {
-			doOptimize(fileResource, result, optim, original);
-		} else {
-			log.trace("Resource {} is already optimized", fileResource);
-		}
-		return result;
-	}
+        if (optimize) {
+            doOptimize(fileResource, result, optim, original);
+        } else {
+            log.trace("Resource {} is already optimized", fileResource);
+        }
+        return result;
+    }
 
-	private void doOptimize(Resource fileResource, OptimizationResult result, OptimizedFile optim, byte[] original) {
-		log.debug("Optimizing file resource {}", fileResource);
-		List<ServiceReference<FileOptimizer>> optimizers = fileOptimizers.get(optim.getMimeType());
-		for (ServiceReference<FileOptimizer> ref : optimizers) {
-			FileOptimizer optimizer = bundleContext.getService(ref);
-			if (optimizer == null) {
-				log.warn("No service retrieved for service reference {}", ref);
-				continue;
-			}
+    private void doOptimize(Resource fileResource, OptimizationResult result, OptimizedFile optim, byte[] original) {
+        log.debug("Optimizing file resource {}", fileResource);
+        List<ServiceReference<FileOptimizer>> optimizers = fileOptimizers.get(optim.getMimeType());
+        for (ServiceReference<FileOptimizer> ref : optimizers) {
+            FileOptimizer optimizer = bundleContext.getService(ref);
+            if (optimizer == null) {
+                log.warn("No service retrieved for service reference {}", ref);
+                continue;
+            }
 
-			byte[] optimized = optimizer.optimizeFile(original, optim.getMimeType());
-			if (optimized != null && optimized.length < original.length) {
+            byte[] optimized = optimizer.optimizeFile(original, optim.getMimeType());
+            if (optimized != null && optimized.length < original.length) {
 
-				double savings = 1.0 - ((double) optimized.length / (double) original.length);
+                double savings = 1.0 - ((double) optimized.length / (double) original.length);
 
-				log.debug("Optimized file with {} saving {}%", optimizer.getName(), Math.round(savings * 100));
-				result.setAlgorithm(optimizer.getName());
-				result.setSavings(savings);
-				result.setOptimized(true);
-				result.setOptimizedSize(optimized.length);
-				result.setOriginalSize(original.length);
-				result.setOptimizedContents(optimized);
-			} else {
-				log.debug("Optimizer {} was not able to optimize the file", optimizer.getName());
-			}
-		}
-	}
+                log.debug("Optimized file with {} saving {}%", optimizer.getName(), Math.round(savings * 100));
+                result.setAlgorithm(optimizer.getName());
+                result.setSavings(savings);
+                result.setOptimized(true);
+                result.setOptimizedSize(optimized.length);
+                result.setOriginalSize(original.length);
+                result.setOptimizedContents(optimized);
+            } else {
+                log.debug("Optimizer {} was not able to optimize the file", optimizer.getName());
+            }
+        }
+    }
 
-	@Override
-	public boolean isOptimized(Resource fileResource) {
+    @Override
+    public boolean isOptimized(Resource fileResource) {
 
-		if (!fileResource.getName().equals(JcrConstants.JCR_CONTENT)
-				&& fileResource.getChild(JcrConstants.JCR_CONTENT) != null) {
-			fileResource = fileResource.getChild(JcrConstants.JCR_CONTENT);
-		}
+        if (!fileResource.getName().equals(JcrConstants.JCR_CONTENT)
+                && fileResource.getChild(JcrConstants.JCR_CONTENT) != null) {
+            fileResource = fileResource.getChild(JcrConstants.JCR_CONTENT);
+        }
 
-		OptimizedFile of = fileResource.adaptTo(OptimizedFile.class);
-		try {
-			String calculatedHash = calculateHash(IOUtils.toByteArray(of.getContent()));
-			log.debug("Comparing stored {} and calculated {} hashes", of.getHash(), calculatedHash);
-			return ObjectUtils.equals(of.getHash(), calculatedHash);
-		} catch (IOException e) {
-			log.error("Exception checking if file optimized, assuming false", e);
-			return false;
-		}
-	}
+        OptimizedFile of = fileResource.adaptTo(OptimizedFile.class);
+        try {
+            String calculatedHash = calculateHash(IOUtils.toByteArray(of.getContent()));
+            log.debug("Comparing stored {} and calculated {} hashes", of.getHash(), calculatedHash);
+            return ObjectUtils.equals(of.getHash(), calculatedHash);
+        } catch (IOException e) {
+            log.error("Exception checking if file optimized, assuming false", e);
+            return false;
+        }
+    }
 
-	@Override
-	public OptimizationResult optimizeFile(Resource fileResource, boolean autoCommit) throws IOException {
+    @Override
+    public OptimizationResult optimizeFile(Resource fileResource, boolean autoCommit) throws IOException {
 
-		OptimizationResult result = getOptimizedContents(fileResource);
+        OptimizationResult result = getOptimizedContents(fileResource);
 
-		ModifiableValueMap mvm = fileResource.adaptTo(ModifiableValueMap.class);
+        ModifiableValueMap mvm = fileResource.adaptTo(ModifiableValueMap.class);
 
-		Set<String> mixins = new HashSet<>(Arrays.asList(mvm.get(JcrConstants.JCR_MIXINTYPES, new String[0])));
-		mixins.add(FileOptimizerConstants.MT_OPTIMIZED);
-		mvm.put(JcrConstants.JCR_MIXINTYPES, mixins.toArray(new String[] {}));
+        Set<String> mixins = new HashSet<>(Arrays.asList(mvm.get(JcrConstants.JCR_MIXINTYPES, new String[0])));
+        mixins.add(FileOptimizerConstants.MT_OPTIMIZED);
+        mvm.put(JcrConstants.JCR_MIXINTYPES, mixins.toArray(new String[] {}));
 
-		mvm.put(FileOptimizerConstants.PN_ALGORITHM, result.getAlgorithm());
-		mvm.put(FileOptimizerConstants.PN_HASH, calculateHash(result.getOptimizedContents()));
-		mvm.put(FileOptimizerConstants.PN_ORIGINAL, mvm.get(JcrConstants.JCR_DATA, InputStream.class));
-		mvm.put(FileOptimizerConstants.PN_SAVINGS, result.getSavings());
+        mvm.put(FileOptimizerConstants.PN_ALGORITHM, result.getAlgorithm());
+        mvm.put(FileOptimizerConstants.PN_HASH, calculateHash(result.getOptimizedContents()));
+        mvm.put(FileOptimizerConstants.PN_ORIGINAL, mvm.get(JcrConstants.JCR_DATA, InputStream.class));
+        mvm.put(FileOptimizerConstants.PN_SAVINGS, result.getSavings());
 
-		mvm.put(JcrConstants.JCR_DATA, new ByteArrayInputStream(result.getOptimizedContents()));
+        mvm.put(JcrConstants.JCR_DATA, new ByteArrayInputStream(result.getOptimizedContents()));
 
-		if (autoCommit) {
-			log.debug("Persisting changes...");
-			fileResource.getResourceResolver().commit();
-		}
+        if (autoCommit) {
+            log.debug("Persisting changes...");
+            fileResource.getResourceResolver().commit();
+        }
 
-		return result;
+        return result;
 
-	}
+    }
 
-	private void rebuildOptimizerCache() {
-		log.debug("rebuildOptimizerCache");
-		Map<String, List<ServiceReference<FileOptimizer>>> tempCache = new HashMap<>();
-		Collection<ServiceReference<FileOptimizer>> references = null;
-		try {
-			references = bundleContext.getServiceReferences(FileOptimizer.class, null);
-		} catch (Exception e) {
-			log.error("Exception retrieving service references", e);
-		}
-		for (ServiceReference<FileOptimizer> ref : references) {
-			Object mimeType = ref.getProperty(FileOptimizerConstants.MIME_TYPE);
-			if (mimeType instanceof String[]) {
-				for (String mt : (String[]) mimeType) {
-					addOptimizer(tempCache, mt, ref);
-				}
-			} else if (mimeType != null) {
-				addOptimizer(tempCache, (String) mimeType, ref);
-			}
-		}
-		for (List<ServiceReference<FileOptimizer>> optList : tempCache.values()) {
-			Collections.sort(optList);
-		}
-		this.fileOptimizers = tempCache;
-	}
+    private void rebuildOptimizerCache() {
+        log.debug("rebuildOptimizerCache");
+        Map<String, List<ServiceReference<FileOptimizer>>> tempCache = new HashMap<>();
+        Collection<ServiceReference<FileOptimizer>> references = null;
+        try {
+            references = bundleContext.getServiceReferences(FileOptimizer.class, null);
+        } catch (Exception e) {
+            log.error("Exception retrieving service references", e);
+        }
+        for (ServiceReference<FileOptimizer> ref : references) {
+            Object mimeType = ref.getProperty(FileOptimizerConstants.MIME_TYPE);
+            if (mimeType instanceof String[]) {
+                for (String mt : (String[]) mimeType) {
+                    addOptimizer(tempCache, mt, ref);
+                }
+            } else if (mimeType != null) {
+                addOptimizer(tempCache, (String) mimeType, ref);
+            }
+        }
+        for (List<ServiceReference<FileOptimizer>> optList : tempCache.values()) {
+            Collections.sort(optList);
+        }
+        this.fileOptimizers = tempCache;
+    }
 
-	@Override
-	public void serviceChanged(ServiceEvent event) {
-		rebuildOptimizerCache();
-	}
+    @Override
+    public void serviceChanged(ServiceEvent event) {
+        rebuildOptimizerCache();
+    }
 
-	/**
-	 * @param fileOptimizers the fileOptimizers to set
-	 */
-	public void setFileOptimizers(Map<String, List<ServiceReference<FileOptimizer>>> fileOptimizers) {
-		this.fileOptimizers = fileOptimizers;
-	}
+    /**
+     * @param fileOptimizers the fileOptimizers to set
+     */
+    public void setFileOptimizers(Map<String, List<ServiceReference<FileOptimizer>>> fileOptimizers) {
+        this.fileOptimizers = fileOptimizers;
+    }
 
 }

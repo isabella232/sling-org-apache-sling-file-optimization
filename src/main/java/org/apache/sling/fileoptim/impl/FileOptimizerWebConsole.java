@@ -41,56 +41,56 @@ import org.osgi.service.component.annotations.Reference;
  * Simple web console plugin for listing out the available optimizers
  */
 @Component(property = { Constants.SERVICE_DESCRIPTION + "=Web Console Plugin for Apache Sling File Optimizer",
-		Constants.SERVICE_VENDOR + "=The Apache Software Foundation",
-		WebConsoleConstants.PLUGIN_LABEL + "=" + FileOptimizerWebConsole.CONSOLE_LABEL,
-		WebConsoleConstants.PLUGIN_TITLE + "=" + FileOptimizerWebConsole.CONSOLE_TITLE,
-		WebConsoleConstants.CONFIG_PRINTER_MODES + "=always",
-		WebConsoleConstants.PLUGIN_CATEGORY + "=Status" }, service = { Servlet.class })
+        Constants.SERVICE_VENDOR + "=The Apache Software Foundation",
+        WebConsoleConstants.PLUGIN_LABEL + "=" + FileOptimizerWebConsole.CONSOLE_LABEL,
+        WebConsoleConstants.PLUGIN_TITLE + "=" + FileOptimizerWebConsole.CONSOLE_TITLE,
+        WebConsoleConstants.CONFIG_PRINTER_MODES + "=always",
+        WebConsoleConstants.PLUGIN_CATEGORY + "=Status" }, service = { Servlet.class })
 public class FileOptimizerWebConsole extends AbstractWebConsolePlugin {
 
-	private static final long serialVersionUID = 7086113364871387281L;
-	public static final String CONSOLE_LABEL = "fileoptim";
-	public static final String CONSOLE_TITLE = "File Optimizer";
+    private static final long serialVersionUID = 7086113364871387281L;
+    public static final String CONSOLE_LABEL = "fileoptim";
+    public static final String CONSOLE_TITLE = "File Optimizer";
 
-	@Reference
-	private FileOptimizerService fileOptimizer;
+    @Reference
+    private FileOptimizerService fileOptimizer;
 
-	@Override
-	public String getTitle() {
-		return CONSOLE_TITLE;
-	}
+    @Override
+    public String getTitle() {
+        return CONSOLE_TITLE;
+    }
 
-	@Override
-	public String getLabel() {
-		return CONSOLE_LABEL;
-	}
+    @Override
+    public String getLabel() {
+        return CONSOLE_LABEL;
+    }
 
-	@Override
-	protected void renderContent(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
-			throws IOException {
-		PrintWriter pw = httpServletResponse.getWriter();
-		pw.println("<div id='content' class='ui-widget'><br>");
-		pw.println("<pre>");
-		pw.println("Available Optimizers");
-		pw.println("========================");
+    @Override
+    protected void renderContent(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+            throws IOException {
+        PrintWriter pw = httpServletResponse.getWriter();
+        pw.println("<div id='content' class='ui-widget'><br>");
+        pw.println("<pre>");
+        pw.println("Available Optimizers");
+        pw.println("========================");
 
-		Map<String, List<ServiceReference<FileOptimizer>>> optimizerCache = ((FileOptimizerServiceImpl) fileOptimizer)
-				.getFileOptimizers();
+        Map<String, List<ServiceReference<FileOptimizer>>> optimizerCache = ((FileOptimizerServiceImpl) fileOptimizer)
+                .getFileOptimizers();
 
-		for (Entry<String, List<ServiceReference<FileOptimizer>>> to : optimizerCache.entrySet()) {
+        for (Entry<String, List<ServiceReference<FileOptimizer>>> to : optimizerCache.entrySet()) {
 
-			pw.println();
-			pw.println(to.getKey());
-			pw.println("-------------------------------------");
-			for (ServiceReference<FileOptimizer> fo : to.getValue()) {
+            pw.println();
+            pw.println(to.getKey());
+            pw.println("-------------------------------------");
+            for (ServiceReference<FileOptimizer> fo : to.getValue()) {
 
-				FileOptimizer o = this.getBundleContext().getService(fo);
+                FileOptimizer o = this.getBundleContext().getService(fo);
 
-				pw.println("- " + o.getName() + " (" + o.getClass().getName() + ")");
-			}
-		}
-		pw.println("</pre>");
-		pw.println("</div>");
-	}
+                pw.println("- " + o.getName() + " (" + o.getClass().getName() + ")");
+            }
+        }
+        pw.println("</pre>");
+        pw.println("</div>");
+    }
 
 }

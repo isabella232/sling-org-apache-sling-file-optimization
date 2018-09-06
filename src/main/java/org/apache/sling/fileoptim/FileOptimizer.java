@@ -18,28 +18,30 @@ package org.apache.sling.fileoptim;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.osgi.annotation.versioning.ConsumerType;
 
 /**
  * Interface for File Optimizers to extend to implement
  */
+@ConsumerType
 public interface FileOptimizer {
 
-	/**
-	 * Optimize a single file.
-	 * 
-	 * @param original the original file to optimize
-	 * @param metaType the type of the file to optimize
-	 * @return the optimized file
-	 */
-	@Nullable
-	byte[] optimizeFile(byte[] original, String metaType);
+    /**
+     * Optimize a single file.
+     * 
+     * @param original the original file to optimize
+     * @param metaType the type of the file to optimize
+     * @return the optimized file
+     */
+    @Nullable
+    byte[] optimizeFile(byte[] original, String metaType);
 
-	/**
-	 * Gets the name of the optimizer
-	 * 
-	 * @return the name of the optimizer
-	 */
-	@NotNull
-	String getName();
+    /**
+     * Gets the name of the optimizer
+     * 
+     * @return the name of the optimizer
+     */
+    @NotNull
+    String getName();
 
 }

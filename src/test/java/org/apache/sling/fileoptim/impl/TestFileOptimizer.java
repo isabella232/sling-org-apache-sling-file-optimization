@@ -32,46 +32,45 @@ import org.slf4j.LoggerFactory;
 
 public class TestFileOptimizer extends BaseFileOptimizerTest {
 
-	public TestFileOptimizer() throws InvalidSyntaxException {
-		super();
-	}
+    public TestFileOptimizer() throws InvalidSyntaxException {
+        super();
+    }
 
-	private static Logger log = LoggerFactory.getLogger(TestFileOptimizer.class);
+    private static Logger log = LoggerFactory.getLogger(TestFileOptimizer.class);
 
-	@Test
-	public void testCanOptimize() {
-		log.info("testCanOptimize");
-		assertTrue(fileOptimizerService.canOptimize(getValidJpegFile()));
-	}
+    @Test
+    public void testCanOptimize() {
+        log.info("testCanOptimize");
+        assertTrue(fileOptimizerService.canOptimize(getValidJpegFile()));
+    }
 
-	@Test
-	public void testCantOptimize() {
-		log.info("testCantOptimize");
-		assertFalse(fileOptimizerService.canOptimize(getValidPngFile()));
-	}
+    @Test
+    public void testCantOptimize() {
+        log.info("testCantOptimize");
+        assertFalse(fileOptimizerService.canOptimize(getValidPngFile()));
+    }
 
-	@Test
-	public void testDisabled() {
-		log.info("testDisabled");
-		assertFalse(fileOptimizerService.canOptimize(getDisabled()));
-	}
-	
+    @Test
+    public void testDisabled() {
+        log.info("testDisabled");
+        assertFalse(fileOptimizerService.canOptimize(getDisabled()));
+    }
 
-	@Test
-	public void isOptimized() {
-		log.info("isOptimized");
-		assertTrue(fileOptimizerService.isOptimized(super.getOptimizedFile()));
-	}
+    @Test
+    public void isOptimized() {
+        log.info("isOptimized");
+        assertTrue(fileOptimizerService.isOptimized(super.getOptimizedFile()));
+    }
 
-	@Test
-	public void testGetOptimizedContents() throws IOException {
-		log.info("testGetOptimizedContents");
-		OptimizationResult res = fileOptimizerService.getOptimizedContents(getValidJpegFile());
-		assertNotNull(res);
-		assertTrue(res.isOptimized());
-		assertNotNull(res.getOptimizedContents());
-		assertEquals(res.getOptimizedContents().length, res.getOptimizedSize());
-		assertTrue(res.getSavings() > 0.0 && res.getSavings() < 1.0);
-	}
+    @Test
+    public void testGetOptimizedContents() throws IOException {
+        log.info("testGetOptimizedContents");
+        OptimizationResult res = fileOptimizerService.getOptimizedContents(getValidJpegFile());
+        assertNotNull(res);
+        assertTrue(res.isOptimized());
+        assertNotNull(res.getOptimizedContents());
+        assertEquals(res.getOptimizedContents().length, res.getOptimizedSize());
+        assertTrue(res.getSavings() > 0.0 && res.getSavings() < 1.0);
+    }
 
 }

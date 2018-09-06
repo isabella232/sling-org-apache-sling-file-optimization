@@ -20,139 +20,136 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.apache.sling.api.resource.Resource;
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Result of file optimization
  */
+@ProviderType
 public class OptimizationResult {
 
-	private String algorithm;
-	private boolean optimized = false;
-	private byte[] optimizedContents;
-	private long optimizedSize;
-	private long originalSize;
-	private final Resource resource;
-	private double savings = 0;
+    private String algorithm;
+    private boolean optimized = false;
+    private byte[] optimizedContents;
+    private long optimizedSize;
+    private long originalSize;
+    private final Resource resource;
+    private double savings = 0;
 
-	public OptimizationResult(Resource resource) {
-		this.resource = resource;
-	}
+    public OptimizationResult(Resource resource) {
+        this.resource = resource;
+    }
 
-	/**
-	 * Returns the algorithm by which the file was optimized
-	 * 
-	 * @return the algorithm
-	 */
-	public String getAlgorithm() {
-		return algorithm;
-	}
+    /**
+     * Returns the algorithm by which the file was optimized
+     * 
+     * @return the algorithm
+     */
+    public String getAlgorithm() {
+        return algorithm;
+    }
 
-	/**
-	 * Returns the raw optimized contents as a byte array
-	 * 
-	 * @return the optimized contents
-	 */
-	public byte[] getOptimizedContents() {
-		return optimizedContents;
-	}
+    /**
+     * Returns the raw optimized contents as a byte array
+     * 
+     * @return the optimized contents
+     */
+    public byte[] getOptimizedContents() {
+        return optimizedContents;
+    }
 
-	/**
-	 * Returns the optimized contents as an InputStream
-	 * 
-	 * @return the optimized content stream
-	 */
-	public InputStream getOptimizedContentStream() {
-		return new ByteArrayInputStream(optimizedContents);
-	}
+    /**
+     * Returns the optimized contents as an InputStream
+     * 
+     * @return the optimized content stream
+     */
+    public InputStream getOptimizedContentStream() {
+        return new ByteArrayInputStream(optimizedContents);
+    }
 
-	/**
-	 * Returns the optimized size in bytes
-	 * 
-	 * @return the optimizedSize
-	 */
-	public long getOptimizedSize() {
-		return optimizedSize;
-	}
+    /**
+     * Returns the optimized size in bytes
+     * 
+     * @return the optimizedSize
+     */
+    public long getOptimizedSize() {
+        return optimizedSize;
+    }
 
-	/**
-	 * Return the original size in bytes
-	 * 
-	 * @return the originalSize
-	 */
-	public long getOriginalSize() {
-		return originalSize;
-	}
+    /**
+     * Return the original size in bytes
+     * 
+     * @return the originalSize
+     */
+    public long getOriginalSize() {
+        return originalSize;
+    }
 
-	/**
-	 * Returns the resource that was optimized
-	 * 
-	 * @return the resource
-	 */
-	public Resource getResource() {
-		return resource;
-	}
+    /**
+     * Returns the resource that was optimized
+     * 
+     * @return the resource
+     */
+    public Resource getResource() {
+        return resource;
+    }
 
-	/**
-	 * Return the percent savings as a 1-based double value
-	 * 
-	 * @return the savings
-	 */
-	public double getSavings() {
-		return savings;
-	}
+    /**
+     * Return the percent savings as a 1-based double value
+     * 
+     * @return the savings
+     */
+    public double getSavings() {
+        return savings;
+    }
 
-	/**
-	 * Returns true if the result is actually optimized, if the optimization did not
-	 * provide a smaller result or the file was not optimized for any other reason,
-	 * this will be false.
-	 * 
-	 * @return the optimized flag
-	 */
-	public boolean isOptimized() {
-		return optimized;
-	}
+    /**
+     * Returns true if the result is actually optimized, if the optimization did not
+     * provide a smaller result or the file was not optimized for any other reason,
+     * this will be false.
+     * 
+     * @return the optimized flag
+     */
+    public boolean isOptimized() {
+        return optimized;
+    }
 
-	/**
-	 * @param algorithm
-	 *            the algorithm to set
-	 */
-	public void setAlgorithm(String algorithm) {
-		this.algorithm = algorithm;
-	}
+    /**
+     * @param algorithm the algorithm to set
+     */
+    public void setAlgorithm(String algorithm) {
+        this.algorithm = algorithm;
+    }
 
-	/**
-	 * @param optimized
-	 *            the optimized to set
-	 */
-	public void setOptimized(boolean optimized) {
-		this.optimized = optimized;
-	}
+    /**
+     * @param optimized the optimized to set
+     */
+    public void setOptimized(boolean optimized) {
+        this.optimized = optimized;
+    }
 
-	public void setOptimizedContents(byte[] optimizedContents) {
-		this.optimizedContents = optimizedContents;
-	}
+    public void setOptimizedContents(byte[] optimizedContents) {
+        this.optimizedContents = optimizedContents;
+    }
 
-	/**
-	 * @param optimizedSize
-	 *            the optimizedSize to set
-	 */
-	public void setOptimizedSize(long optimizedSize) {
-		this.optimizedSize = optimizedSize;
-	}
+    /**
+     * @param optimizedSize the optimizedSize to set
+     */
+    public void setOptimizedSize(long optimizedSize) {
+        this.optimizedSize = optimizedSize;
+    }
 
-	/**
-	 * @param originalSize
-	 *            the originalSize to set
-	 */
-	public void setOriginalSize(long originalSize) {
-		this.originalSize = originalSize;
-	}
+    /**
+     * @param originalSize the originalSize to set
+     */
+    public void setOriginalSize(long originalSize) {
+        this.originalSize = originalSize;
+    }
 
-	/**
-	 * @param savings
-	 *            the savings to set
-	 */
-	public void setSavings(double savings) {
-		this.savings = savings;
-	}
+    /**
+     * @param savings the savings to set
+     */
+    public void setSavings(double savings) {
+        this.savings = savings;
+    }
 }

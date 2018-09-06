@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.sling.fileoptim.optimizers;
+package org.apache.sling.fileoptim.internal.optimizers;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +29,7 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import org.apache.sling.fileoptim.FileOptimizer;
 import org.apache.sling.fileoptim.FileOptimizerConstants;
-import org.apache.sling.fileoptim.optimizers.JpegFileOptimizer.Config;
+import org.apache.sling.fileoptim.internal.optimizers.JpegFileOptimizer.Config;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -46,46 +46,46 @@ import org.slf4j.LoggerFactory;
 @Designate(ocd = Config.class)
 public class JpegFileOptimizer implements FileOptimizer {
 
-	private static final Logger log = LoggerFactory.getLogger(JpegFileOptimizer.class);
+    private static final Logger log = LoggerFactory.getLogger(JpegFileOptimizer.class);
 
-	@ObjectClassDefinition(name = "%jpeg.optimizer.name", description = "%jpeg.optimizer.description", localization = "OSGI-INF/l10n/bundle")
-	public @interface Config {
-		@AttributeDefinition(name = "%jpeg.optimizer.compression.level.name", description = "%jpeg.optimizer.compression.level.description")
-		float compressionLevel() default 0.8f;
-	}
+    @ObjectClassDefinition(name = "%jpeg.optimizer.name", description = "%jpeg.optimizer.description", localization = "OSGI-INF/l10n/bundle")
+    public @interface Config {
+        @AttributeDefinition(name = "%jpeg.optimizer.compression.level.name", description = "%jpeg.optimizer.compression.level.description")
+        float compressionLevel() default 0.8f;
+    }
 
-	private Config config;
+    private Config config;
 
-	@Activate
-	@Modified
-	public void activate(Config config) {
-		this.config = config;
-	}
+    @Activate
+    @Modified
+    public void activate(Config config) {
+        this.config = config;
+    }
 
-	@Override
-	public byte[] optimizeFile(byte[] original, String metaType) {
-		ImageWriter jpgWriter = ImageIO.getImageWritersByFormatName("jpg").next();
-		ImageWriteParam jpgWriteParam = jpgWriter.getDefaultWriteParam();
-		jpgWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-		jpgWriteParam.setCompressionQuality(config.compressionLevel());
+    @Override
+    public byte[] optimizeFile(byte[] original, String metaType) {
+        ImageWriter jpgWriter = ImageIO.getImageWritersByFormatName("jpg").next();
+        ImageWriteParam jpgWriteParam = jpgWriter.getDefaultWriteParam();
+        jpgWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+        jpgWriteParam.setCompressionQuality(config.compressionLevel());
 
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ImageOutputStream outputStream = new MemoryCacheImageOutputStream(baos);
-		jpgWriter.setOutput(outputStream);
-		try {
-			IIOImage outputImage = new IIOImage(ImageIO.read(new ByteArrayInputStream(original)), null, null);
-			jpgWriter.write(null, outputImage, jpgWriteParam);
-			jpgWriter.dispose();
-			return baos.toByteArray();
-		} catch (IOException e) {
-			log.warn("Exception optimizing image", e);
-		}
-		return null;
-	}
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageOutputStream outputStream = new MemoryCacheImageOutputStream(baos);
+        jpgWriter.setOutput(outputStream);
+        try {
+            IIOImage outputImage = new IIOImage(ImageIO.read(new ByteArrayInputStream(original)), null, null);
+            jpgWriter.write(null, outputImage, jpgWriteParam);
+            jpgWriter.dispose();
+            return baos.toByteArray();
+        } catch (IOException e) {
+            log.warn("Exception optimizing image", e);
+        }
+        return null;
+    }
 
-	@Override
-	public String getName() {
-		return "Apache Sling JPEG File Optimizer";
-	}
+    @Override
+    public String getName() {
+        return "Apache Sling JPEG File Optimizer";
+    }
 
 }

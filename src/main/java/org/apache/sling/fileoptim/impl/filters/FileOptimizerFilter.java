@@ -48,64 +48,64 @@ import org.slf4j.LoggerFactory;
  * Sling Servlet Filter for optimizing a file response.
  */
 @Component(service = { Filter.class }, property = { "sling.filter.scope="
-		+ EngineConstants.FILTER_SCOPE_REQUEST }, configurationPolicy = ConfigurationPolicy.REQUIRE)
+        + EngineConstants.FILTER_SCOPE_REQUEST }, configurationPolicy = ConfigurationPolicy.REQUIRE)
 @Designate(ocd = Config.class)
 public class FileOptimizerFilter implements Filter {
 
-	@ObjectClassDefinition(name = "%filter.name", description = "%filter.description", localization = "OSGI-INF/l10n/bundle")
-	public @interface Config {
+    @ObjectClassDefinition(name = "%filter.name", description = "%filter.description", localization = "OSGI-INF/l10n/bundle")
+    public @interface Config {
 
-		@AttributeDefinition(name = "%filter.pattern.name", description = "%filter.pattern.description")
-		String sling_filter_pattern() default "-";
+        @AttributeDefinition(name = "%filter.pattern.name", description = "%filter.pattern.description")
+        String sling_filter_pattern() default "-";
 
-		@AttributeDefinition(name = "%filter.service.ranking.name", description = "%filter.service.ranking.name")
-		int service_ranking() default 0;
+        @AttributeDefinition(name = "%filter.service.ranking.name", description = "%filter.service.ranking.name")
+        int service_ranking() default 0;
 
-	}
+    }
 
-	private static final Logger log = LoggerFactory.getLogger(FileOptimizerFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(FileOptimizerFilter.class);
 
-	@Reference
-	private FileOptimizerService fileOptimizer;
+    @Reference
+    private FileOptimizerService fileOptimizer;
 
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-		// Nothing required
-	}
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // Nothing required
+    }
 
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		if (request instanceof SlingHttpServletRequest) {
-			Resource resource = ((SlingHttpServletRequest) request).getResource();
-			try {
-				if (fileOptimizer.canOptimize(resource)) {
-					log.debug("Returning optimized file");
-					OptimizationResult res = fileOptimizer.getOptimizedContents(resource);
-					if (res.isOptimized()) {
-						OptimizedFile of = null;
-						if (!resource.getName().equals(JcrConstants.JCR_CONTENT)) {
-							of = resource.getChild(JcrConstants.JCR_CONTENT).adaptTo(OptimizedFile.class);
-						} else {
-							of = resource.adaptTo(OptimizedFile.class);
-						}
-						response.setContentType(of.getMimeType());
-						response.setContentLengthLong(res.getOptimizedSize());
-						((HttpServletResponse) response).setHeader("Optimized-With", res.getAlgorithm());
-						IOUtils.copy(res.getOptimizedContentStream(), response.getOutputStream());
-						return;
-					}
-				}
-			} catch (Exception e) {
-				log.warn("Unexpected exception attempting to optimize file response", e);
-			}
-		}
-		chain.doFilter(request, response);
-	}
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        if (request instanceof SlingHttpServletRequest) {
+            Resource resource = ((SlingHttpServletRequest) request).getResource();
+            try {
+                if (fileOptimizer.canOptimize(resource)) {
+                    log.debug("Returning optimized file");
+                    OptimizationResult res = fileOptimizer.getOptimizedContents(resource);
+                    if (res.isOptimized()) {
+                        OptimizedFile of = null;
+                        if (!resource.getName().equals(JcrConstants.JCR_CONTENT)) {
+                            of = resource.getChild(JcrConstants.JCR_CONTENT).adaptTo(OptimizedFile.class);
+                        } else {
+                            of = resource.adaptTo(OptimizedFile.class);
+                        }
+                        response.setContentType(of.getMimeType());
+                        response.setContentLengthLong(res.getOptimizedSize());
+                        ((HttpServletResponse) response).setHeader("Optimized-With", res.getAlgorithm());
+                        IOUtils.copy(res.getOptimizedContentStream(), response.getOutputStream());
+                        return;
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Unexpected exception attempting to optimize file response", e);
+            }
+        }
+        chain.doFilter(request, response);
+    }
 
-	@Override
-	public void destroy() {
-		// Nothing requireds
-	}
+    @Override
+    public void destroy() {
+        // Nothing requireds
+    }
 
 }

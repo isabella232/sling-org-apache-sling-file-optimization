@@ -25,6 +25,7 @@ import org.apache.sling.fileoptim.FileOptimizerService;
 import org.apache.sling.fileoptim.OptimizationResult;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.annotations.injectorspecific.OSGiService;
+import org.osgi.annotation.versioning.ProviderType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,60 +33,61 @@ import org.slf4j.LoggerFactory;
  * Sling model for executing the optimizer on a resource, will not commit the
  * result
  */
+@ProviderType
 @Model(adaptables = Resource.class)
 public class OptimizeResource {
 
-	private static final Logger log = LoggerFactory.getLogger(OptimizeResource.class);
+    private static final Logger log = LoggerFactory.getLogger(OptimizeResource.class);
 
-	private boolean canOptimize;
+    private boolean canOptimize;
 
-	@OSGiService
-	private FileOptimizerService fileOptimizer;
+    @OSGiService
+    private FileOptimizerService fileOptimizer;
 
-	private OptimizationResult result;
+    private OptimizationResult result;
 
-	private Resource resource;
+    private Resource resource;
 
-	public OptimizeResource(Resource resource) {
-		this.resource = resource;
-	}
+    public OptimizeResource(Resource resource) {
+        this.resource = resource;
+    }
 
-	@PostConstruct
-	public void init() throws IOException {
-		log.debug("initializing with resource {}", resource);
-		if (fileOptimizer.canOptimize(resource)) {
-			this.canOptimize = true;
-			this.result = fileOptimizer.getOptimizedContents(resource);
-		} else {
-			this.canOptimize = false;
-			this.result = null;
-		}
-	}
+    @PostConstruct
+    public void init() throws IOException {
+        log.debug("initializing with resource {}", resource);
+        if (fileOptimizer.canOptimize(resource)) {
+            this.canOptimize = true;
+            this.result = fileOptimizer.getOptimizedContents(resource);
+        } else {
+            this.canOptimize = false;
+            this.result = null;
+        }
+    }
 
-	/**
-	 * Returns true if the file is optimized, false otherwise
-	 * 
-	 * @return
-	 */
-	public boolean isOptimized() {
-		return fileOptimizer.isOptimized(resource);
-	}
+    /**
+     * Returns true if the file is optimized, false otherwise
+     * 
+     * @return
+     */
+    public boolean isOptimized() {
+        return fileOptimizer.isOptimized(resource);
+    }
 
-	/**
-	 * Gets the optimization result.
-	 * 
-	 * @return
-	 */
-	public OptimizationResult getResult() {
-		return result;
-	}
+    /**
+     * Gets the optimization result.
+     * 
+     * @return
+     */
+    public OptimizationResult getResult() {
+        return result;
+    }
 
-	/**
-	 * Return true if the file can be optimized
-	 * 
-	 * @return
-	 */
-	public boolean isCanOptimize() {
-		return canOptimize;
-	}
+    /**
+     * Return true if the file can be optimized
+     * 
+     * @return
+     */
+    public boolean isCanOptimize() {
+        return canOptimize;
+    }
 }

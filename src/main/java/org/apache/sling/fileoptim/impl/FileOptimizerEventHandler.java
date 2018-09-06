@@ -47,56 +47,56 @@ import org.slf4j.LoggerFactory;
 @Designate(ocd = Config.class)
 public class FileOptimizerEventHandler implements EventHandler {
 
-	@ObjectClassDefinition(name = "%event.handler.name", description = "%event.handler.description", localization = "OSGI-INF/l10n/bundle")
-	public @interface Config {
-		@AttributeDefinition(name = "%event.handler.filter.name", description = "%event.handler.filter.description")
-		String event_filter() default "(&(resourceType=sling:File)(|(path=*.png)(path=*.jpg)))";
+    @ObjectClassDefinition(name = "%event.handler.name", description = "%event.handler.description", localization = "OSGI-INF/l10n/bundle")
+    public @interface Config {
+        @AttributeDefinition(name = "%event.handler.filter.name", description = "%event.handler.filter.description")
+        String event_filter() default "(&(resourceType=sling:File)(|(path=*.png)(path=*.jpg)))";
 
-		@AttributeDefinition(name = "%event.handler.topics.name", description = "%event.handler.topics.description")
-		String[] event_topics() default { SlingConstants.TOPIC_RESOURCE_ADDED, SlingConstants.TOPIC_RESOURCE_CHANGED };
-	}
+        @AttributeDefinition(name = "%event.handler.topics.name", description = "%event.handler.topics.description")
+        String[] event_topics() default { SlingConstants.TOPIC_RESOURCE_ADDED, SlingConstants.TOPIC_RESOURCE_CHANGED };
+    }
 
-	private static final Logger log = LoggerFactory.getLogger(FileOptimizerEventHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(FileOptimizerEventHandler.class);
 
-	@Reference
-	private FileOptimizerService fileOptimizer;
+    @Reference
+    private FileOptimizerService fileOptimizer;
 
-	private ResourceResolver resourceResolver;
+    private ResourceResolver resourceResolver;
 
-	@Reference
-	private ResourceResolverFactory rrf;
+    @Reference
+    private ResourceResolverFactory rrf;
 
-	@Activate
-	@Modified
-	public void activate(Config config) throws LoginException {
-		deactivate();
-		resourceResolver = rrf.getServiceResourceResolver(null);
-	}
+    @Activate
+    @Modified
+    public void activate(Config config) throws LoginException {
+        deactivate();
+        resourceResolver = rrf.getServiceResourceResolver(null);
+    }
 
-	@Deactivate
-	public void deactivate() {
-		if (resourceResolver != null) {
-			resourceResolver.close();
-		}
-	}
+    @Deactivate
+    public void deactivate() {
+        if (resourceResolver != null) {
+            resourceResolver.close();
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.osgi.service.event.EventHandler#handleEvent(org.osgi.service.event.Event)
-	 */
-	@Override
-	public void handleEvent(Event event) {
-		String path = (String) event.getProperty(SlingConstants.PROPERTY_PATH);
-		Resource fileResource = resourceResolver.getResource(path);
-		if (fileResource != null && fileOptimizer.canOptimize(fileResource)) {
-			try {
-				fileOptimizer.optimizeFile(fileResource, true);
-			} catch (IOException e) {
-				log.error("Exception saving optimized file", e);
-			}
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.osgi.service.event.EventHandler#handleEvent(org.osgi.service.event.Event)
+     */
+    @Override
+    public void handleEvent(Event event) {
+        String path = (String) event.getProperty(SlingConstants.PROPERTY_PATH);
+        Resource fileResource = resourceResolver.getResource(path);
+        if (fileResource != null && fileOptimizer.canOptimize(fileResource)) {
+            try {
+                fileOptimizer.optimizeFile(fileResource, true);
+            } catch (IOException e) {
+                log.error("Exception saving optimized file", e);
+            }
+        }
+    }
 
 }

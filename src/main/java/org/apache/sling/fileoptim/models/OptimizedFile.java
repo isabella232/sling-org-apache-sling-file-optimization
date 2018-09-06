@@ -28,42 +28,44 @@ import org.apache.sling.models.annotations.Default;
 import org.apache.sling.models.annotations.DefaultInjectionStrategy;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.annotations.Required;
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Sling Model representing a file which can be or has been optimized.
  */
+@ProviderType
 @Model(adaptables = Resource.class, defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL)
 public interface OptimizedFile {
 
-	@Named(FileOptimizerConstants.PN_ALGORITHM)
-	@Inject
-	String getAlgorithm();
+    @Named(FileOptimizerConstants.PN_ALGORITHM)
+    @Inject
+    String getAlgorithm();
 
-	@Named(FileOptimizerConstants.PN_DISABLED)
-	@Inject
-	@Default(booleanValues = false)
-	boolean getDisabled();
+    @Named(FileOptimizerConstants.PN_DISABLED)
+    @Inject
+    @Default(booleanValues = false)
+    boolean getDisabled();
 
-	@Named(JcrConstants.JCR_DATA)
-	@Inject
-	@Required
-	InputStream getContent();
+    @Named(JcrConstants.JCR_DATA)
+    @Inject
+    @Required
+    InputStream getContent();
 
-	@Named(FileOptimizerConstants.PN_HASH)
-	@Inject
-	String getHash();
+    @Named(FileOptimizerConstants.PN_HASH)
+    @Inject
+    String getHash();
 
-	@Named(JcrConstants.JCR_MIMETYPE)
-	@Inject
-	@Required
-	String getMimeType();
+    @Named(JcrConstants.JCR_MIMETYPE)
+    @Inject
+    @Required
+    String getMimeType();
 
-	@Named(FileOptimizerConstants.PN_ORIGINAL)
-	@Inject
-	InputStream getOriginal();
+    @Named(FileOptimizerConstants.PN_ORIGINAL)
+    @Inject
+    InputStream getOriginal();
 
-	@Named(FileOptimizerConstants.PN_SAVINGS)
-	@Inject
-	double getSavings();
+    @Named(FileOptimizerConstants.PN_SAVINGS)
+    @Inject
+    double getSavings();
 
 }

@@ -37,31 +37,31 @@ import org.osgi.service.component.annotations.Reference;
  * Servlet for displaying a preview of an optimized image.
  */
 @Component(service = Servlet.class, property = { "sling.servlet.paths=/system/fileoptim/preview",
-		"sling.servlet.methods=GET" }, immediate = true)
+        "sling.servlet.methods=GET" }, immediate = true)
 public class FileOptimizerPreview extends SlingSafeMethodsServlet {
 
-	@Reference
-	private transient FileOptimizerService fileOptimizer;
+    @Reference
+    private transient FileOptimizerService fileOptimizer;
 
-	private static final long serialVersionUID = 8635343288414416865L;
+    private static final long serialVersionUID = 8635343288414416865L;
 
-	@Override
-	protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response)
-			throws ServletException, IOException {
-		String path = request.getParameter("path");
+    @Override
+    protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response)
+            throws ServletException, IOException {
+        String path = request.getParameter("path");
 
-		Resource resource = request.getResourceResolver().getResource(path);
+        Resource resource = request.getResourceResolver().getResource(path);
 
-		if (resource == null) {
-			response.sendError(404, "No Resource found at path " + path);
-		} else if (fileOptimizer.canOptimize(resource)) {
-			OptimizationResult res = fileOptimizer.getOptimizedContents(resource);
-			ValueMap vm = res.getResource().getValueMap();
-			response.setContentType(vm.get(JcrConstants.JCR_MIMETYPE, String.class));
-			response.setHeader("Content-disposition", "inline; filename=" + resource.getName());
-			IOUtils.copy(res.getOptimizedContentStream(), response.getOutputStream());
-		} else {
-			response.sendError(400, "Resource at path " + path + " is not a file or cannot be optimized");
-		}
-	}
+        if (resource == null) {
+            response.sendError(404, "No Resource found at path " + path);
+        } else if (fileOptimizer.canOptimize(resource)) {
+            OptimizationResult res = fileOptimizer.getOptimizedContents(resource);
+            ValueMap vm = res.getResource().getValueMap();
+            response.setContentType(vm.get(JcrConstants.JCR_MIMETYPE, String.class));
+            response.setHeader("Content-disposition", "inline; filename=" + resource.getName());
+            IOUtils.copy(res.getOptimizedContentStream(), response.getOutputStream());
+        } else {
+            response.sendError(400, "Resource at path " + path + " is not a file or cannot be optimized");
+        }
+    }
 }
