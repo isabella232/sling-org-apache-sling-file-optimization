@@ -22,7 +22,7 @@
     </parent>
 
     <artifactId>org.apache.sling.fileoptim</artifactId>
-    <version>0.9.3-SNAPSHOT</version>
+    <version>0.9.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>Apache Sling File Optimization</name>
