@@ -29,12 +29,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.sling.api.resource.ModifiableValueMap;
 import org.apache.sling.api.resource.Resource;
@@ -207,7 +207,7 @@ public class FileOptimizerServiceImpl implements FileOptimizerService, ServiceLi
         try {
             String calculatedHash = calculateHash(IOUtils.toByteArray(of.getContent()));
             log.debug("Comparing stored {} and calculated {} hashes", of.getHash(), calculatedHash);
-            return ObjectUtils.equals(of.getHash(), calculatedHash);
+            return Objects.equals(of.getHash(), calculatedHash);
         } catch (IOException e) {
             log.error("Exception checking if file optimized, assuming false", e);
             return false;
