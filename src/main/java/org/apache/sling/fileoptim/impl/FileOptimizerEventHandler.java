@@ -49,9 +49,11 @@ public class FileOptimizerEventHandler implements EventHandler {
 
     @ObjectClassDefinition(name = "%event.handler.name", description = "%event.handler.description", localization = "OSGI-INF/l10n/bundle")
     public @interface Config {
+        @SuppressWarnings("squid:S00100")
         @AttributeDefinition(name = "%event.handler.filter.name", description = "%event.handler.filter.description")
         String event_filter() default "(&(resourceType=sling:File)(|(path=*.png)(path=*.jpg)))";
 
+        @SuppressWarnings("squid:S00100")
         @AttributeDefinition(name = "%event.handler.topics.name", description = "%event.handler.topics.description")
         String[] event_topics() default { SlingConstants.TOPIC_RESOURCE_ADDED, SlingConstants.TOPIC_RESOURCE_CHANGED };
     }

@@ -40,10 +40,10 @@ import org.osgi.service.component.annotations.Reference;
         "sling.servlet.methods=GET" }, immediate = true)
 public class FileOptimizerPreview extends SlingSafeMethodsServlet {
 
+    private static final long serialVersionUID = 8635343288414416865L;
+
     @Reference
     private transient FileOptimizerService fileOptimizer;
-
-    private static final long serialVersionUID = 8635343288414416865L;
 
     @Override
     protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response)

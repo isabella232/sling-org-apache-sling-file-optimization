@@ -53,7 +53,7 @@ public class FileOptimizerWebConsole extends AbstractWebConsolePlugin {
     public static final String CONSOLE_TITLE = "File Optimizer";
 
     @Reference
-    private FileOptimizerService fileOptimizer;
+    private transient FileOptimizerService fileOptimizer;
 
     @Override
     public String getTitle() {
